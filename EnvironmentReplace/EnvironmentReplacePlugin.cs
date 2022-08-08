@@ -25,7 +25,7 @@ namespace EnvironmentReplace
         {
             Logger.LogInfo("Loaded: kmyuhkyuk-EnvironmentReplace");
 
-            string MainSettings = "主设置 Main Settings";
+            string MainSettings = "Environment Replace Settings";
 
             KeyEnvironment = Config.Bind<bool>(MainSettings, "替换环境 Environment Replace", true);
             KeyRotate = Config.Bind<bool>(MainSettings, "环境旋转 Environment Rotate", true);

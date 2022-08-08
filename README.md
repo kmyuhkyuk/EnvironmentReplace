@@ -1,6 +1,6 @@
 # EnvironmentReplace
 
-Replace Environment Scene​
+Replace Main menu background
 
 ## How build the source
 1. Dowload or Clone the branch
