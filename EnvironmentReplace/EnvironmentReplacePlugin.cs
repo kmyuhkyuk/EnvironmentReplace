@@ -18,8 +18,8 @@ namespace EnvironmentReplace
 
         public readonly static string videospath = "file://" + AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace/videos/";
 
-        public static ConfigEntry<bool> KeyEnvironment { get; set; }
-        public static ConfigEntry<bool> KeyRotate { get; set; }
+        public static ConfigEntry<bool> KeyEnvironment;
+        public static ConfigEntry<bool> KeyRotate;
 
         private void Start()
         {
