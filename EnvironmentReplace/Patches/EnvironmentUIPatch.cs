@@ -20,7 +20,7 @@ namespace EnvironmentReplace.Patches
 
             if (EnvironmentReplacePlugin.KeyEnvironment.Value)
             {
-                EnvironmentReplacePlugin.Env(__instance, __instance.GetComponent<EnvironmentShading>());
+                EnvironmentReplacePlugin.Env(__instance, __instance.gameObject.GetComponent<EnvironmentShading>());
             }
         }
     }
