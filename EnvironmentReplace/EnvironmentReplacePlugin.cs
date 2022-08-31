@@ -18,8 +18,10 @@ namespace EnvironmentReplace
 
         public readonly static string videospath = "file://" + AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace/videos/";
 
-        public static ConfigEntry<bool> KeyEnvironment;
-        public static ConfigEntry<bool> KeyRotate;
+        public static ConfigEntry<bool> KeyEnvironment { get; private set; }
+        public static ConfigEntry<bool> KeyRotate { get; private set; }
+
+        public static Action<EnvironmentUI, EnvironmentShading> EnvironmentReplace;
 
         private void Start()
         {
@@ -34,6 +36,8 @@ namespace EnvironmentReplace
 
             new EnvironmentUIPatch().Enable();
             new EnvironmentUIMainPatch().Enable();
+
+            EnvironmentReplace += Env;
         }
         async void LoadBundle()
         {
@@ -55,7 +59,7 @@ namespace EnvironmentReplace
             }
         }
 
-        public static void Env(EnvironmentUI envui, EnvironmentShading envshading)
+        void Env(EnvironmentUI envui, EnvironmentShading envshading)
         {
             Traverse root = Traverse.Create(envui).Field("environmentUIRoot_0");
 
