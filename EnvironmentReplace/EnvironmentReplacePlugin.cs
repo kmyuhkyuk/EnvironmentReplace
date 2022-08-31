@@ -58,6 +58,7 @@ namespace EnvironmentReplace
             EnvironmentReplace += Env;
             EnvironmentRotate += EnvRotate;
         }
+
         async void LoadBundle()
         {
             //Load AssetBundle
