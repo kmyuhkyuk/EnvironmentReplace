@@ -11,7 +11,7 @@ using EnvironmentReplace.Patches;
 
 namespace EnvironmentReplace
 {
-    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.2.0")]
+    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.2.1")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
         public static GameObject prefab;
