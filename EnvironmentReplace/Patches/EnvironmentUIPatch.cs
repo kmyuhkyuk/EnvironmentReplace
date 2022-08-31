@@ -18,10 +18,7 @@ namespace EnvironmentReplace.Patches
         {
             await __result;
 
-            if (EnvironmentReplacePlugin.KeyEnvironment.Value)
-            {
-                EnvironmentReplacePlugin.EnvironmentReplace(__instance, __instance.GetComponent<EnvironmentShading>());
-            }
+            EnvironmentReplacePlugin.EnvironmentReplace(__instance);
         }
     }
 }
