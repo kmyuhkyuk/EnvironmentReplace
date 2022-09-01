@@ -45,7 +45,7 @@ namespace EnvironmentReplace
 
             settingsdata.KeyEnvironment = Config.Bind<bool>(MainSettings, "替换环境 Environment Replace", true);
             settingsdata.KeyRotate = Config.Bind<bool>(MainSettings, "环境旋转 Environment Rotate", true);
-            settingsdata.KeyBundleName = Config.Bind<string>(MainSettings, "Bundle Name", "newenvironmentuiroot.bundle");
+            settingsdata.KeyBundleName = Config.Bind<string>(MainSettings, "Environment Bundle Name", "newenvironmentuiroot.bundle");
 
             LoadImage(modpath + "/images");
             LoadBundle();
