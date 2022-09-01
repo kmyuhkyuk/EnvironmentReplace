@@ -1,6 +1,6 @@
 # EnvironmentReplace
 
-Replace Main menu background
+Replace Main menu background and Splash Screen
 
 ## How build the source
 1. Dowload or Clone the branch
