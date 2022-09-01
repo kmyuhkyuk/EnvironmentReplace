@@ -18,9 +18,9 @@ namespace EnvironmentReplace
     [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.0")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
-        public static GameObject prefab;
-
         public readonly static string modpath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
+
+        private GameObject prefab;
 
         private Sprite sprite;
 
@@ -45,6 +45,7 @@ namespace EnvironmentReplace
 
             settingsdata.KeyEnvironment = Config.Bind<bool>(MainSettings, "替换环境 Environment Replace", true);
             settingsdata.KeyRotate = Config.Bind<bool>(MainSettings, "环境旋转 Environment Rotate", true);
+            settingsdata.KeyBundleName = Config.Bind<string>(MainSettings, "Bundle Name", "newenvironmentuiroot.bundle");
 
             LoadImage(modpath + "/images");
             LoadBundle();
@@ -61,7 +62,7 @@ namespace EnvironmentReplace
         async void LoadBundle()
         {
             //Load AssetBundle
-            var www = AssetBundle.LoadFromFileAsync(modpath + "/bundles/newenvironmentuiroot.bundle");
+            var www = AssetBundle.LoadFromFileAsync(modpath + "/bundles/" + settingsdata.KeyBundleName.Value);
 
             while (!www.isDone)
                 await Task.Yield();
@@ -86,7 +87,10 @@ namespace EnvironmentReplace
 
             images = directory.EnumerateFiles().Where(x => extension.Contains(x.Extension.ToLower())).Select(x => x.FullName).ToArray();
 
-            sprite = await LoadAsyncSprite(images[UnityEngine.Random.Range(0, images.Length - 1)]);
+            if (images.Length > 0)
+            {
+                sprite = await LoadAsyncSprite(images[UnityEngine.Random.Range(0, images.Length - 1)]);
+            }
         }
 
         async Task<Sprite> LoadAsyncSprite(string path)
@@ -163,7 +167,7 @@ namespace EnvironmentReplace
 
                 Sprite[] _sprites = Traverse.Create(splash).Field("_sprites").GetValue<Sprite[]>();
 
-                if (!settingsdata.KeyOriginalSplash.Value)
+                if (!settingsdata.KeyOriginalSplash.Value && sprite != null)
                 {
                     sprites = sprite;
                 }
@@ -194,6 +198,8 @@ namespace EnvironmentReplace
 
             public ConfigEntry<bool> KeyEnvironment;
             public ConfigEntry<bool> KeyRotate;
+
+            public ConfigEntry<string> KeyBundleName;
         }
     }
 }
