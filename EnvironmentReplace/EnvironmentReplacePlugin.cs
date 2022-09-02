@@ -15,7 +15,7 @@ using EnvironmentReplace.Patches;
 
 namespace EnvironmentReplace
 {
-    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
+    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.0")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
         public readonly static string modpath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
@@ -30,9 +30,7 @@ namespace EnvironmentReplace
 
         public static Action<SplashScreenPanel> SplashScreenPanelReplace;
 
-        public static Action<EnvironmentUI> Environment;
-
-        public static Func<bool> EnvironmentReplace;
+        public static Action<EnvironmentUI> EnvironmentReplace;
 
         public static Func<bool> EnvironmentRotate;
 
@@ -57,8 +55,7 @@ namespace EnvironmentReplace
             new EnvironmentUIMainPatch().Enable();
 
             SplashScreenPanelReplace += SSP;
-            Environment += Env;
-            EnvironmentReplace += EnvReplace;
+            EnvironmentReplace += Env;
             EnvironmentRotate += EnvRotate;
         }
 
@@ -156,11 +153,6 @@ namespace EnvironmentReplace
         bool EnvRotate()
         {
             return settingsdata.KeyRotate.Value;
-        }
-
-        bool EnvReplace()
-        {
-            return settingsdata.KeyEnvironment.Value;
         }
 
         void SSP(SplashScreenPanel splash)
