@@ -18,7 +18,10 @@ namespace EnvironmentReplace.Patches
         {
             await __result;
 
-            EnvironmentReplacePlugin.EnvironmentReplace(__instance);
+            if (EnvironmentReplacePlugin.EnvironmentReplace())
+            {
+                EnvironmentReplacePlugin.Environment(__instance);
+            }
         }
     }
 }
