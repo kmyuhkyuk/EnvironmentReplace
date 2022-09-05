@@ -54,9 +54,9 @@ namespace EnvironmentReplace
             new EnvironmentUIPatch().Enable();
             new EnvironmentUIMainPatch().Enable();
 
-            SplashScreenPanelReplace += SSP;
-            EnvironmentReplace += Env;
-            EnvironmentRotate += EnvRotate;
+            SplashScreenPanelReplace = SSP;
+            EnvironmentReplace = Env;
+            EnvironmentRotate = EnvRotate;
         }
 
         async void LoadBundle()
