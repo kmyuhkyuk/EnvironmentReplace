@@ -15,7 +15,7 @@ using EnvironmentReplace.Patches;
 
 namespace EnvironmentReplace
 {
-    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.0")]
+    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
         public readonly static string modpath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
@@ -28,11 +28,11 @@ namespace EnvironmentReplace
 
         private SettingsData settingsdata = new SettingsData();
 
-        public static Action<SplashScreenPanel> SplashScreenPanelReplace;
+        internal static Action<SplashScreenPanel> SplashScreenPanelReplace;
 
-        public static Action<EnvironmentUI> EnvironmentReplace;
+        internal static Action<EnvironmentUI> EnvironmentReplace;
 
-        public static Func<bool> EnvironmentRotate;
+        internal static Func<bool> EnvironmentRotate;
 
         private void Start()
         {
@@ -81,11 +81,11 @@ namespace EnvironmentReplace
 
         async void LoadImage(string path)
         {
-            DirectoryInfo directory = new DirectoryInfo(path.Replace("/", "\\"));
+            DirectoryInfo directory = new DirectoryInfo(@path);
 
-            string[] extension = new string[] { ".png", ".jpg", ".tga", ".bmp", ".psd" };
+            string[] extensions = new string[] { ".png", ".jpg", ".tga", ".bmp", ".psd" };
 
-            images = directory.EnumerateFiles().Where(x => extension.Contains(x.Extension.ToLower())).Select(x => x.FullName).ToArray();
+            images = directory.EnumerateFiles().Where(x => extensions.Contains(x.Extension.ToLower())).Select(x => x.FullName).ToArray();
 
             if (images.Length > 0)
             {
