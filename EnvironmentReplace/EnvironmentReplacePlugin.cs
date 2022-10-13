@@ -69,7 +69,7 @@ namespace EnvironmentReplace
 
             if (www.assetBundle == null)
             {
-                Debug.Log("Failed to load AssetBundle!");
+                Debug.LogError("Failed to load AssetBundle!");
             }
             else
             {
