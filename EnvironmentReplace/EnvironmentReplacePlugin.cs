@@ -18,7 +18,7 @@ namespace EnvironmentReplace
     [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
-        public readonly static string modpath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
+        private readonly string modpath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
 
         private GameObject prefab;
 
@@ -26,7 +26,7 @@ namespace EnvironmentReplace
 
         private string[] images;
 
-        private SettingsData settingsdata = new SettingsData();
+        private readonly SettingsData settingsdata = new SettingsData();
 
         internal static Action<SplashScreenPanel> SplashScreenPanelReplace;
 
