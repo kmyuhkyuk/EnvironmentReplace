@@ -18,15 +18,15 @@ namespace EnvironmentReplace
     [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
-        private readonly string modpath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
+        private readonly string ModPath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
 
-        private GameObject prefab;
+        private GameObject EnvironmentPrefab;
 
-        private Sprite sprite;
+        private Sprite SplashSprite;
 
-        private string[] images;
+        private string[] SplashImages;
 
-        private readonly SettingsData settingsdata = new SettingsData();
+        private readonly SettingsData SettingsDatas = new SettingsData();
 
         internal static Action<SplashScreenPanel> SplashScreenPanelReplace;
 
@@ -38,16 +38,16 @@ namespace EnvironmentReplace
         {
             Logger.LogInfo("Loaded: kmyuhkyuk-EnvironmentReplace");
 
-            string MainSettings = "Environment Replace Settings";
+            string mainSettings = "Environment Replace Settings";
 
-            settingsdata.KeySplash = Config.Bind<bool>(MainSettings, "启动屏幕替换 Splash Screen Replace", true);
-            settingsdata.KeyOriginalSplash = Config.Bind<bool>(MainSettings, "使用原始启动图片 Use Original Splash Image", true);
+            SettingsDatas.KeySplash = Config.Bind<bool>(mainSettings, "启动屏幕替换 Splash Screen Replace", true);
+            SettingsDatas.KeyOriginalSplash = Config.Bind<bool>(mainSettings, "使用原始启动图片 Use Original Splash Image", true);
 
-            settingsdata.KeyEnvironment = Config.Bind<bool>(MainSettings, "替换环境 Environment Replace", true);
-            settingsdata.KeyRotate = Config.Bind<bool>(MainSettings, "环境旋转 Environment Rotate", true);
-            settingsdata.KeyBundleName = Config.Bind<string>(MainSettings, "Environment Bundle Name", "newenvironmentuiroot.bundle");
+            SettingsDatas.KeyEnvironment = Config.Bind<bool>(mainSettings, "替换环境 Environment Replace", true);
+            SettingsDatas.KeyRotate = Config.Bind<bool>(mainSettings, "环境旋转 Environment Rotate", true);
+            SettingsDatas.KeyBundleName = Config.Bind<string>(mainSettings, "Environment Bundle Name", "newenvironmentuiroot.bundle");
 
-            LoadImage(modpath + "/images");
+            LoadImage(ModPath + "/images");
             LoadBundle();
 
             new SplashScreenPanelPatch().Enable();
@@ -62,7 +62,7 @@ namespace EnvironmentReplace
         async void LoadBundle()
         {
             //Load AssetBundle
-            var www = AssetBundle.LoadFromFileAsync(modpath + "/bundles/" + settingsdata.KeyBundleName.Value);
+            var www = AssetBundle.LoadFromFileAsync(ModPath + "/bundles/" + SettingsDatas.KeyBundleName.Value);
 
             while (!www.isDone)
                 await Task.Yield();
@@ -73,7 +73,7 @@ namespace EnvironmentReplace
             }
             else
             {
-                prefab = www.assetBundle.LoadAsset<GameObject>("newenvironmentuiroot");
+                EnvironmentPrefab = www.assetBundle.LoadAsset<GameObject>("newenvironmentuiroot");
 
                 www.assetBundle.Unload(false);
             }
@@ -85,11 +85,11 @@ namespace EnvironmentReplace
 
             string[] extensions = new string[] { ".png", ".jpg", ".tga", ".bmp", ".psd" };
 
-            images = directory.EnumerateFiles().Where(x => extensions.Contains(x.Extension.ToLower())).Select(x => x.FullName).ToArray();
+            SplashImages = directory.EnumerateFiles().Where(x => extensions.Contains(x.Extension.ToLower())).Select(x => x.FullName).ToArray();
 
-            if (images.Length > 0)
+            if (SplashImages.Length > 0)
             {
-                sprite = await LoadAsyncSprite(images[UnityEngine.Random.Range(0, images.Length - 1)]);
+                SplashSprite = await LoadAsyncSprite(SplashImages[UnityEngine.Random.Range(0, SplashImages.Length - 1)]);
             }
         }
 
@@ -97,9 +97,9 @@ namespace EnvironmentReplace
         {
             UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);
 
-            var SendWeb = www.SendWebRequest();
+            var sendWeb = www.SendWebRequest();
 
-            while (!SendWeb.isDone)
+            while (!sendWeb.isDone)
                 await Task.Yield();
 
             if (www.isNetworkError || www.isHttpError)
@@ -116,7 +116,7 @@ namespace EnvironmentReplace
 
         void Env(EnvironmentUI envui)
         {
-            if (settingsdata.KeyEnvironment.Value)
+            if (SettingsDatas.KeyEnvironment.Value)
             {
                 Traverse root = Traverse.Create(envui).Field("environmentUIRoot_0");
 
@@ -126,38 +126,38 @@ namespace EnvironmentReplace
                 //From EnvironmentUI Get alignmentCamera, Events, bool_0
                 Camera _alignmentCamera = Traverse.Create(envui).Field("_alignmentCamera").GetValue<Camera>();
 
-                EEventType[] Events = Traverse.Create(envui).Property("Events").GetValue<EEventType[]>();
+                EEventType[] events = Traverse.Create(envui).Property("Events").GetValue<EEventType[]>();
 
                 bool bool_0 = Traverse.Create(envui).Field("bool_0").GetValue<bool>();
 
                 //Create New Environment
-                GameObject newenv = Instantiate(prefab, envui.transform);
+                GameObject newEnv = Instantiate(EnvironmentPrefab, envui.transform);
 
                 //Video Local Paths Url Replace
-                foreach (VideoPlayer vp in newenv.GetComponentsInChildren<VideoPlayer>())
+                foreach (VideoPlayer vp in newEnv.GetComponentsInChildren<VideoPlayer>())
                 {
-                    vp.url = "file://" + modpath + "/videos/" + vp.url;
+                    vp.url = "file://" + ModPath + "/videos/" + vp.url;
                 }
 
                 //EnvironmentUI Set New EnvironmentUIRoot
-                root.SetValue(newenv.GetComponent<EnvironmentUIRoot>());
+                root.SetValue(newEnv.GetComponent<EnvironmentUIRoot>());
 
                 //Init New EnvironmentUIRoot
-                EnvironmentUIRoot envuiroot = root.GetValue<EnvironmentUIRoot>();
+                EnvironmentUIRoot envUIRoot = root.GetValue<EnvironmentUIRoot>();
 
-                envuiroot.Init(_alignmentCamera, Events, bool_0);
-                Traverse.Create(envui).Field("_environmentShading").GetValue<EnvironmentShading>().SetDefaultShading(envuiroot.Shading);
+                envUIRoot.Init(_alignmentCamera, events, bool_0);
+                Traverse.Create(envui).Field("_environmentShading").GetValue<EnvironmentShading>().SetDefaultShading(envUIRoot.Shading);
             }
         }
 
         bool EnvRotate()
         {
-            return settingsdata.KeyRotate.Value;
+            return SettingsDatas.KeyRotate.Value;
         }
 
         void SSP(SplashScreenPanel splash)
         {
-            if (settingsdata.KeySplash.Value)
+            if (SettingsDatas.KeySplash.Value)
             {
                 Image _splashScreen = Traverse.Create(splash).Field("_splashScreen").GetValue<Image>();
 
@@ -165,19 +165,19 @@ namespace EnvironmentReplace
 
                 Sprite[] _sprites = Traverse.Create(splash).Field("_sprites").GetValue<Sprite[]>();
 
-                if (!settingsdata.KeyOriginalSplash.Value && sprite != null)
+                if (!SettingsDatas.KeyOriginalSplash.Value && SplashSprite != null)
                 {
-                    sprites = sprite;
+                    sprites = SplashSprite;
                 }
                 else
                 {
-                    int length = images.Length + _sprites.Length;
+                    int length = SplashImages.Length + _sprites.Length;
 
                     int num = UnityEngine.Random.Range(0, length - 1);
 
                     if (num >= _sprites.Length)
                     {
-                        sprites = sprite;
+                        sprites = SplashSprite;
                     }
                     else
                     {
