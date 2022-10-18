@@ -18,7 +18,7 @@ namespace EnvironmentReplace
     [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
-        private readonly string ModPath = AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/kmyuhkyuk-EnvironmentReplace";
+        private readonly string ModPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace") ;
 
         private GameObject EnvironmentPrefab;
 
@@ -47,7 +47,7 @@ namespace EnvironmentReplace
             SettingsDatas.KeyRotate = Config.Bind<bool>(mainSettings, "环境旋转 Environment Rotate", true);
             SettingsDatas.KeyBundleName = Config.Bind<string>(mainSettings, "Environment Bundle Name", "newenvironmentuiroot.bundle");
 
-            LoadImage(ModPath + "/images");
+            LoadImage(Path.Combine(ModPath, "images"));
             LoadBundle();
 
             new SplashScreenPanelPatch().Enable();
@@ -62,7 +62,7 @@ namespace EnvironmentReplace
         async void LoadBundle()
         {
             //Load AssetBundle
-            var www = AssetBundle.LoadFromFileAsync(ModPath + "/bundles/" + SettingsDatas.KeyBundleName.Value);
+            var www = AssetBundle.LoadFromFileAsync(Path.Combine(ModPath, "bundles", SettingsDatas.KeyBundleName.Value));
 
             while (!www.isDone)
                 await Task.Yield();
@@ -73,7 +73,7 @@ namespace EnvironmentReplace
             }
             else
             {
-                EnvironmentPrefab = www.assetBundle.LoadAsset<GameObject>("newenvironmentuiroot");
+                EnvironmentPrefab = www.assetBundle.LoadAllAssets<GameObject>()[0];
 
                 www.assetBundle.Unload(false);
             }
