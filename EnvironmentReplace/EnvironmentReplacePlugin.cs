@@ -28,9 +28,13 @@ namespace EnvironmentReplace
 
         private readonly SettingsData SettingsDatas = new SettingsData();
 
-        internal static Action<SplashScreenPanel> SplashScreenPanelReplace;
+        internal delegate void RefEnvironment(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot);
 
-        internal static Action<EnvironmentUI> EnvironmentReplace;
+        internal delegate void RefSplashScreePanel(Sprite[] _sprites, ref Image _splashScreen);
+
+        internal static RefEnvironment EnvironmentReplace;
+
+        internal static RefSplashScreePanel SplashScreenPanelReplace;
 
         internal static Func<bool> EnvironmentRotate;
 
@@ -114,24 +118,18 @@ namespace EnvironmentReplace
             }
         }
 
-        void Env(EnvironmentUI envui)
+        void Env(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot)
         {
             if (SettingsDatas.KeyEnvironment.Value)
             {
-                Traverse root = Traverse.Create(envui).Field("environmentUIRoot_0");
-
                 //Remove Orgin Environment GameObject
-                Destroy(root.GetValue<EnvironmentUIRoot>().gameObject);
-
-                //From EnvironmentUI Get alignmentCamera, Events, bool_0
-                Camera _alignmentCamera = Traverse.Create(envui).Field("_alignmentCamera").GetValue<Camera>();
-
-                EEventType[] events = Traverse.Create(envui).Property("Events").GetValue<EEventType[]>();
-
-                bool bool_0 = Traverse.Create(envui).Field("bool_0").GetValue<bool>();
+                if (envuiroot != null)
+                {
+                    Destroy(envuiroot.gameObject);
+                }
 
                 //Create New Environment
-                GameObject newEnv = Instantiate(EnvironmentPrefab, envui.transform);
+                GameObject newEnv = Instantiate(EnvironmentPrefab, envui);
 
                 //Video Local Paths Url Replace
                 foreach (VideoPlayer vp in newEnv.GetComponentsInChildren<VideoPlayer>())
@@ -140,13 +138,12 @@ namespace EnvironmentReplace
                 }
 
                 //EnvironmentUI Set New EnvironmentUIRoot
-                root.SetValue(newEnv.GetComponent<EnvironmentUIRoot>());
+                envuiroot = newEnv.GetComponent<EnvironmentUIRoot>();
 
                 //Init New EnvironmentUIRoot
-                EnvironmentUIRoot envUIRoot = root.GetValue<EnvironmentUIRoot>();
 
-                envUIRoot.Init(_alignmentCamera, events, bool_0);
-                Traverse.Create(envui).Field("_environmentShading").GetValue<EnvironmentShading>().SetDefaultShading(envUIRoot.Shading);
+                envuiroot.Init(_alignmentCamera, Events, bool_0);
+                _environmentShading.SetDefaultShading(envuiroot.Shading);
             }
         }
 
@@ -155,15 +152,11 @@ namespace EnvironmentReplace
             return SettingsDatas.KeyRotate.Value;
         }
 
-        void SSP(SplashScreenPanel splash)
+        void SSP(Sprite[] _sprites, ref Image _splashScreen)
         {
             if (SettingsDatas.KeySplash.Value)
             {
-                Image _splashScreen = Traverse.Create(splash).Field("_splashScreen").GetValue<Image>();
-
                 Sprite sprites;
-
-                Sprite[] _sprites = Traverse.Create(splash).Field("_sprites").GetValue<Sprite[]>();
 
                 if (!SettingsDatas.KeyOriginalSplash.Value && SplashSprite != null)
                 {

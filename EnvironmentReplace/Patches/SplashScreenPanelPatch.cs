@@ -2,6 +2,8 @@
 using Aki.Reflection.Utils;
 using System.Reflection;
 using EFT.UI;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace EnvironmentReplace.Patches
 {
@@ -13,9 +15,9 @@ namespace EnvironmentReplace.Patches
         }
 
         [PatchPrefix]
-        private static void PatchPrefix(SplashScreenPanel __instance)
+        private static void PatchPrefix(Sprite[] ____sprites, ref Image ____splashScreen)
         {
-            EnvironmentReplacePlugin.SplashScreenPanelReplace(__instance);
+            EnvironmentReplacePlugin.SplashScreenPanelReplace(____sprites, ref ____splashScreen);
         }
     }
 }
