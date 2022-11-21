@@ -42,7 +42,7 @@ namespace EnvironmentReplace
         {
             Logger.LogInfo("Loaded: kmyuhkyuk-EnvironmentReplace");
 
-            string mainSettings = "Environment Replace Settings";
+            const string mainSettings = "Environment Replace Settings";
 
             SettingsDatas.KeySplash = Config.Bind<bool>(mainSettings, "启动屏幕替换 Splash Screen Replace", true);
             SettingsDatas.KeyOriginalSplash = Config.Bind<bool>(mainSettings, "使用原始启动图片 Use Original Splash Image", true);
