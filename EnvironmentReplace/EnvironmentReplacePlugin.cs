@@ -134,7 +134,7 @@ namespace EnvironmentReplace
                 //Video Local Paths Url Replace
                 foreach (VideoPlayer vp in newEnv.GetComponentsInChildren<VideoPlayer>())
                 {
-                    vp.url = "file://" + ModPath + "/videos/" + vp.url;
+                    vp.url = string.Concat("file://", Path.Combine(ModPath, "videos", vp.url));
                 }
 
                 //EnvironmentUI Set New EnvironmentUIRoot
