@@ -1,9 +1,9 @@
 ﻿using Aki.Reflection.Patching;
 using Aki.Reflection.Utils;
 using System.Reflection;
-using EFT.UI;
 using UnityEngine;
 using UnityEngine.UI;
+using EFT.UI;
 
 namespace EnvironmentReplace.Patches
 {

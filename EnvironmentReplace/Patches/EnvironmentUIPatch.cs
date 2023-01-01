@@ -2,9 +2,9 @@
 using Aki.Reflection.Utils;
 using HarmonyLib;
 using System.Reflection;
-using EFT.UI;
 using UnityEngine;
 using EFT;
+using EFT.UI;
 
 namespace EnvironmentReplace.Patches
 {
