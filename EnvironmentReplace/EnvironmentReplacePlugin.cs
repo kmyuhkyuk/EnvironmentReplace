@@ -27,7 +27,7 @@ namespace EnvironmentReplace
 
         private readonly SettingsData SettingsDatas = new SettingsData();
 
-        internal delegate void RefEnvironment(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot);
+        internal delegate bool RefEnvironment(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot);
 
         internal delegate void RefSplashScreePanel(Sprite[] _sprites, ref Image _splashScreen);
 
@@ -117,10 +117,12 @@ namespace EnvironmentReplace
             }
         }
 
-        void Env(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot)
+        bool Env(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot)
         {
             if (SettingsDatas.KeyEnvironment.Value)
             {
+                return true;
+
                 //Remove Orgin Environment GameObject
                 if (envuiroot != null)
                 {
@@ -143,6 +145,10 @@ namespace EnvironmentReplace
 
                 envuiroot.Init(_alignmentCamera, Events, bool_0);
                 _environmentShading.SetDefaultShading(envuiroot.Shading);
+            }
+            else
+            {
+                return false;
             }
         }
 
