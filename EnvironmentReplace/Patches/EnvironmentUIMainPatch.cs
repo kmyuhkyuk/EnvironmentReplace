@@ -14,7 +14,7 @@ namespace EnvironmentReplace.Patches
         [PatchPrefix]
         private static void PatchPrefix(ref bool isMain)
         {
-            if (!EnvironmentReplacePlugin.EnvironmentRotate())
+            if (!EnvironmentReplacePlugin.OpenEnvironmentRotate())
             {
                 isMain = true;
             }

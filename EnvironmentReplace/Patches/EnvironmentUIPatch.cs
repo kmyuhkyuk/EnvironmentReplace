@@ -18,7 +18,16 @@ namespace EnvironmentReplace.Patches
         [PatchPrefix]
         private static bool PatchPrefix(EnvironmentUI __instance, Camera ____alignmentCamera, bool ___bool_0, EnvironmentShading ____environmentShading, ref EnvironmentUIRoot ___environmentUIRoot_0)
         {
-            return !EnvironmentReplacePlugin.EnvironmentReplace(__instance.transform, ____alignmentCamera, Traverse.Create(__instance).Property("Events").GetValue<EEventType[]>(), ___bool_0, ____environmentShading, ref ___environmentUIRoot_0);
+            if (EnvironmentReplacePlugin.OpenEnvironmentReplace())
+            {
+                EnvironmentReplacePlugin.EnvironmentReplace(__instance.transform, ____alignmentCamera, Traverse.Create(__instance).Property("Events").GetValue<EEventType[]>(), ___bool_0, ____environmentShading, ref ___environmentUIRoot_0);
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

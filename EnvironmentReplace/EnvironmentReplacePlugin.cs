@@ -27,7 +27,7 @@ namespace EnvironmentReplace
 
         private readonly SettingsData SettingsDatas = new SettingsData();
 
-        internal delegate bool RefEnvironment(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot);
+        internal delegate void RefEnvironment(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot);
 
         internal delegate void RefSplashScreePanel(Sprite[] _sprites, ref Image _splashScreen);
 
@@ -35,7 +35,9 @@ namespace EnvironmentReplace
 
         internal static RefSplashScreePanel SplashScreenPanelReplace;
 
-        internal static Func<bool> EnvironmentRotate;
+        internal static Func<bool> OpenEnvironmentReplace;
+
+        internal static Func<bool> OpenEnvironmentRotate;
 
         private void Start()
         {
@@ -59,7 +61,8 @@ namespace EnvironmentReplace
 
             SplashScreenPanelReplace = SSP;
             EnvironmentReplace = Env;
-            EnvironmentRotate = EnvRotate;
+            OpenEnvironmentReplace = OpenEnv;
+            OpenEnvironmentRotate = OpenEnvRotate;
         }
 
         async void LoadBundle()
@@ -117,41 +120,37 @@ namespace EnvironmentReplace
             }
         }
 
-        bool Env(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot)
+        void Env(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot)
         {
-            if (SettingsDatas.KeyEnvironment.Value)
+            //Remove Orgin Environment GameObject
+            if (envuiroot != null)
             {
-                return true;
-
-                //Remove Orgin Environment GameObject
-                if (envuiroot != null)
-                {
-                    Destroy(envuiroot.gameObject);
-                }
-
-                //Create New Environment
-                GameObject newEnv = Instantiate(EnvironmentPrefab, envui);
-
-                //Video Local Paths Url Replace
-                foreach (VideoPlayer vp in newEnv.GetComponentsInChildren<VideoPlayer>())
-                {
-                    vp.url = string.Concat("file://", Path.Combine(ModPath, "videos", vp.url));
-                }
-
-                //EnvironmentUI Set New EnvironmentUIRoot
-                envuiroot = newEnv.GetComponent<EnvironmentUIRoot>();
-
-                //Init New EnvironmentUIRoot
-                envuiroot.Init(_alignmentCamera, Events, bool_0);
-                _environmentShading.SetDefaultShading(envuiroot.Shading);
+                Destroy(envuiroot.gameObject);
             }
-            else
+
+            //Create New Environment
+            GameObject newEnv = Instantiate(EnvironmentPrefab, envui);
+
+            //Video Local Paths Url Replace
+            foreach (VideoPlayer vp in newEnv.GetComponentsInChildren<VideoPlayer>())
             {
-                return false;
+                vp.url = string.Concat("file://", Path.Combine(ModPath, "videos", vp.url));
             }
+
+            //EnvironmentUI Set New EnvironmentUIRoot
+            envuiroot = newEnv.GetComponent<EnvironmentUIRoot>();
+
+            //Init New EnvironmentUIRoot
+            envuiroot.Init(_alignmentCamera, Events, bool_0);
+            _environmentShading.SetDefaultShading(envuiroot.Shading);
         }
 
-        bool EnvRotate()
+        bool OpenEnv()
+        {
+            return SettingsDatas.KeyEnvironment.Value;
+        }
+
+        bool OpenEnvRotate()
         {
             return SettingsDatas.KeyRotate.Value;
         }
