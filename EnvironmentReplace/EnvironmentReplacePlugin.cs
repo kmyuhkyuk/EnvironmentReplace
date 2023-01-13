@@ -142,7 +142,6 @@ namespace EnvironmentReplace
                 envuiroot = newEnv.GetComponent<EnvironmentUIRoot>();
 
                 //Init New EnvironmentUIRoot
-
                 envuiroot.Init(_alignmentCamera, Events, bool_0);
                 _environmentShading.SetDefaultShading(envuiroot.Shading);
             }
