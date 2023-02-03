@@ -101,22 +101,23 @@ namespace EnvironmentReplace
 
         async Task<Sprite> LoadAsyncSprite(string path)
         {
-            UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);
-
-            var sendWeb = www.SendWebRequest();
-
-            while (!sendWeb.isDone)
-                await Task.Yield();
-
-            if (www.isNetworkError || www.isHttpError)
+            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(path))
             {
-                return null;
-            }
-            else
-            {
-                Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+                var sendWeb = www.SendWebRequest();
 
-                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                while (!sendWeb.isDone)
+                    await Task.Yield();
+
+                if (www.isNetworkError || www.isHttpError)
+                {
+                    return null;
+                }
+                else
+                {
+                    Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+
+                    return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                }
             }
         }
 
