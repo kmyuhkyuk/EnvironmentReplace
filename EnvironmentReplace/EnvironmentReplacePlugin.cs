@@ -17,8 +17,6 @@ namespace EnvironmentReplace
     [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
-        private readonly string ModPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace") ;
-
         private GameObject EnvironmentPrefab;
 
         private Sprite SplashSprite;
@@ -64,14 +62,16 @@ namespace EnvironmentReplace
 
         private void Awake()
         {
-            LoadImage(Path.Combine(ModPath, "images"));
-            LoadBundle();
+            string modPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace");
+
+            LoadImage(Path.Combine(modPath, "images"));
+            LoadBundle(Path.Combine(modPath, "bundles", SettingsDatas.KeyBundleName.Value));
         }
 
-        async void LoadBundle()
+        async void LoadBundle(string path)
         {
             //Load AssetBundle
-            var www = AssetBundle.LoadFromFileAsync(Path.Combine(ModPath, "bundles", SettingsDatas.KeyBundleName.Value));
+            var www = AssetBundle.LoadFromFileAsync(path);
 
             while (!www.isDone)
                 await Task.Yield();
