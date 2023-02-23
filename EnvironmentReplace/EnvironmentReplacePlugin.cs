@@ -52,9 +52,6 @@ namespace EnvironmentReplace
             SettingsDatas.KeyRotate = Config.Bind<bool>(mainSettings, "环境旋转 Environment Rotate", true);
             SettingsDatas.KeyBundleName = Config.Bind<string>(mainSettings, "Environment Bundle Name", "newenvironmentuiroot.bundle");
 
-            LoadImage(Path.Combine(ModPath, "images"));
-            LoadBundle();
-
             new SplashScreenPanelPatch().Enable();
             new EnvironmentUIPatch().Enable();
             new EnvironmentUIMainPatch().Enable();
@@ -63,6 +60,12 @@ namespace EnvironmentReplace
             EnvironmentReplace = Env;
             OpenEnvironmentReplace = OpenEnv;
             OpenEnvironmentRotate = OpenEnvRotate;
+        }
+
+        private void Awake()
+        {
+            LoadImage(Path.Combine(ModPath, "images"));
+            LoadBundle();
         }
 
         async void LoadBundle()
