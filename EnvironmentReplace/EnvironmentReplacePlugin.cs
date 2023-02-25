@@ -14,7 +14,7 @@ using EnvironmentReplace.Patches;
 
 namespace EnvironmentReplace
 {
-    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.1")]
+    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.2")]
     public class EnvironmentReplacePlugin : BaseUnityPlugin
     {
         private readonly string ModPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace");
