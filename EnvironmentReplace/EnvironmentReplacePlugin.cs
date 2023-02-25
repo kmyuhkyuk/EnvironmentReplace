@@ -98,7 +98,7 @@ namespace EnvironmentReplace
 
             if (SplashImages.Length > 0)
             {
-                SplashSprite = await LoadAsyncSprite(SplashImages[UnityEngine.Random.Range(0, SplashImages.Length - 1)]);
+                SplashSprite = await LoadAsyncSprite(SplashImages[UnityEngine.Random.Range(0, SplashImages.Length)]);
             }
         }
 
@@ -173,7 +173,7 @@ namespace EnvironmentReplace
                 {
                     int length = SplashImages.Length + _sprites.Length;
 
-                    int num = UnityEngine.Random.Range(0, length - 1);
+                    int num = UnityEngine.Random.Range(0, length);
 
                     if (num >= _sprites.Length)
                     {
