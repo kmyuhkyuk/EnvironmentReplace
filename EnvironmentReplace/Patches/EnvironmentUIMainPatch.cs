@@ -8,15 +8,19 @@ namespace EnvironmentReplace.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(EnvironmentUI).GetMethod("SetAsMain", BindingFlags.Public | BindingFlags.Instance);
+            return typeof(EnvironmentUIRoot).GetMethod("RandomRotate", BindingFlags.Public | BindingFlags.Instance);
         }
 
         [PatchPrefix]
-        private static void PatchPrefix(ref bool isMain)
+        private static bool PatchPrefix(EnvironmentUIRoot __instance)
         {
             if (!EnvironmentReplacePlugin.OpenEnvironmentRotate())
             {
-                isMain = true;
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
     }
