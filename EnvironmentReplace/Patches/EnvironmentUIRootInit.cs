@@ -30,11 +30,11 @@ namespace EnvironmentReplace
 
                 var camera = __instance.GetComponentInChildren<Camera>(true);
 
-                foreach (var monoBehaviour in camera.GetComponents<MonoBehaviour>())
+                foreach (var behaviour in camera.GetComponents<Behaviour>())
                 {
-                    if (monoBehaviour.GetType() != typeof(Camera))
+                    if (behaviour.GetType() != typeof(Camera))
                     {
-                        monoBehaviour.enabled = false;
+                        behaviour.enabled = false;
                     }
                 }
 
