@@ -21,17 +21,36 @@ namespace EnvironmentReplace
                     return;
 
                 var gameObject = new GameObject("RawImage", typeof(Canvas), typeof(CanvasScaler), typeof(RawImage),
-                    typeof(VideoPlayer));
+                    typeof(VideoPlayer))
+                {
+                    layer = 25
+                };
 
                 gameObject.transform.SetParent(__instance.transform);
 
+                var camera = __instance.GetComponentInChildren<Camera>(true);
+
+                foreach (var monoBehaviour in camera.GetComponents<MonoBehaviour>())
+                {
+                    if (monoBehaviour.GetType() != typeof(Camera))
+                    {
+                        monoBehaviour.enabled = false;
+                    }
+                }
+
+                var layout = __instance.GetComponentInChildren<MeshRenderer>().transform;
+                while (layout.parent != __instance.transform)
+                {
+                    layout = layout.parent;
+                }
+
+                layout.gameObject.SetActive(false);
+
                 var canvas = gameObject.GetComponent<Canvas>();
 
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = -1;
-                canvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 |
-                                                  AdditionalCanvasShaderChannels.Normal |
-                                                  AdditionalCanvasShaderChannels.Tangent;
+                canvas.worldCamera = camera;
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.sortingOrder = -1000;
 
                 var rawImage = gameObject.GetComponent<RawImage>();
 

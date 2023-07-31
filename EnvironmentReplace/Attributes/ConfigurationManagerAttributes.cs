@@ -1,4 +1,4 @@
-﻿namespace GamePanelHUDCore.Attributes
+﻿namespace EnvironmentReplace.Attributes
 {
     // ReSharper disable UnassignedField.Global
     // ReSharper disable IdentifierTypo
