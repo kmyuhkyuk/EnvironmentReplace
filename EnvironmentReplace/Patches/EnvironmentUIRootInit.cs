@@ -28,7 +28,7 @@ namespace EnvironmentReplace
                 var canvas = gameObject.GetComponent<Canvas>();
 
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = 0;
+                canvas.sortingOrder = -1;
                 canvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 |
                                                   AdditionalCanvasShaderChannels.Normal |
                                                   AdditionalCanvasShaderChannels.Tangent;
