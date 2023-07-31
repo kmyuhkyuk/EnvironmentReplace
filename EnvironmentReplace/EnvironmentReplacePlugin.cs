@@ -1,200 +1,167 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using System;
+﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BepInEx;
+using BepInEx.Configuration;
+using EFT.UI;
+using EFTReflection;
+using EFTUtils;
+using EnvironmentReplace.Attributes;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
-using UnityEngine.Networking;
-using EFT;
-using EFT.UI;
-using EnvironmentReplace.Patches;
 
 namespace EnvironmentReplace
 {
-    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.3.2")]
-    public class EnvironmentReplacePlugin : BaseUnityPlugin
+    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.4.0")]
+    [BepInDependency("com.kmyuhkyuk.EFTApi", "1.1.4")]
+    [EFTConfigurationPluginAttributes("https://hub.sp-tarkov.com/files/file/759-environment-replace")]
+    public partial class EnvironmentReplacePlugin : BaseUnityPlugin
     {
-        private readonly string ModPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace");
+        private static readonly string ModPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace");
 
-        private GameObject EnvironmentPrefab;
+        private static ImageVideo _splash;
 
-        private Sprite SplashSprite;
+        private static ImageVideo _environment;
 
-        private string[] SplashImages;
+        private static VideoPlayer _splashVideoPlayer;
 
-        private readonly SettingsData SettingsDatas = new SettingsData();
+        private static VideoPlayer _environmentVideoPlayer;
 
-        internal delegate void RefEnvironment(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot);
+        private static SettingsData _settingsData;
 
-        internal delegate void RefSplashScreePanel(Sprite[] _sprites, ref Image _splashScreen);
+        private readonly ReflectionData _reflectionData = new ReflectionData();
 
-        internal static RefEnvironment EnvironmentReplace;
+        public EnvironmentReplacePlugin()
+        {
+            _settingsData = new SettingsData(Config);
 
-        internal static RefSplashScreePanel SplashScreenPanelReplace;
+            _splash = new ImageVideo(Path.Combine(ModPath, "splash"));
+            _environment = new ImageVideo(Path.Combine(ModPath, "environment"));
 
-        internal static Func<bool> OpenEnvironmentReplace;
+            _settingsData.KeyVideoVolume.SettingChanged += (sender, args) =>
+            {
+                var volume = (float)_settingsData.KeyVideoVolume.Value / 100;
 
-        internal static Func<bool> OpenEnvironmentRotate;
+                if (_splashVideoPlayer != null)
+                {
+                    _splashVideoPlayer.SetDirectAudioVolume(0, volume);
+                }
+
+                if (_environmentVideoPlayer != null)
+                {
+                    _environmentVideoPlayer.SetDirectAudioVolume(0, volume);
+                }
+            };
+        }
 
         private void Start()
         {
-            Logger.LogInfo("Loaded: kmyuhkyuk-EnvironmentReplace");
-
-            const string mainSettings = "Environment Replace Settings";
-
-            SettingsDatas.KeySplash = Config.Bind<bool>(mainSettings, "启动屏幕替换 Splash Screen Replace", true);
-            SettingsDatas.KeyOriginalSplash = Config.Bind<bool>(mainSettings, "使用原始启动图片 Use Original Splash Image", true);
-
-            SettingsDatas.KeyEnvironment = Config.Bind<bool>(mainSettings, "替换环境 Environment Replace", true);
-            SettingsDatas.KeyRotate = Config.Bind<bool>(mainSettings, "环境旋转 Environment Rotate", true);
-
-            new SplashScreenPanelPatch().Enable();
-            new EnvironmentUIPatch().Enable();
-            new EnvironmentUIMainPatch().Enable();
-
-            SplashScreenPanelReplace = SSP;
-            EnvironmentReplace = Env;
-            OpenEnvironmentReplace = OpenEnv;
-            OpenEnvironmentRotate = OpenEnvRotate;
+            _reflectionData.EnvironmentUIRootInit.Add(this, nameof(EnvironmentUIRootInit), HarmonyPatchType.Prefix);
+            _reflectionData.SplashScreenPanelMethod0.Add(this, nameof(SplashScreenPanelMethod0),
+                HarmonyPatchType.Prefix);
         }
 
-        private void Awake()
+        public class ImageVideo
         {
-            LoadImage(Path.Combine(ModPath, "images"));
-            LoadBundle(Path.Combine(ModPath, "bundles", "newenvironmentuiroot.bundle"));
-        }
+            public Task<Texture2D> Texture2D;
 
-        async void LoadBundle(string path)
-        {
-            //Load AssetBundle
-            var www = AssetBundle.LoadFromFileAsync(path);
+            public string[] ImagePaths;
 
-            while (!www.isDone)
-                await Task.Yield();
+            public FileInfo Video;
 
-            if (www.assetBundle == null)
+            public string[] VideoPaths;
+
+            public readonly string Path;
+
+            public ImageVideo(string path)
             {
-                Logger.LogError("Failed to load AssetBundle!");
+                Path = path;
             }
-            else
+
+            public void Load()
             {
-                EnvironmentPrefab = www.assetBundle.LoadAllAssets<GameObject>()[0];
+                var directory = new DirectoryInfo(Path);
 
-                www.assetBundle.Unload(false);
-            }
-        }
+                var files = directory.EnumerateFiles().ToArray();
 
-        async void LoadImage(string path)
-        {
-            DirectoryInfo directory = new DirectoryInfo(@path);
+                ImagePaths = files.Where(x =>
+                        FileExtensions.Image.Contains(x.Extension, StringComparer.OrdinalIgnoreCase))
+                    .Select(x => x.FullName).ToArray();
 
-            string[] extensions = new string[] { ".png", ".jpg", ".tga", ".bmp", ".psd" };
+                VideoPaths = files.Where(x =>
+                        FileExtensions.Video.Contains(x.Extension, StringComparer.OrdinalIgnoreCase))
+                    .Select(x => x.FullName).ToArray();
 
-            SplashImages = directory.EnumerateFiles().Where(x => extensions.Contains(x.Extension.ToLower())).Select(x => x.FullName).ToArray();
-
-            if (SplashImages.Length > 0)
-            {
-                SplashSprite = await LoadAsyncSprite(SplashImages[UnityEngine.Random.Range(0, SplashImages.Length)]);
-            }
-        }
-
-        async Task<Sprite> LoadAsyncSprite(string path)
-        {
-            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(path))
-            {
-                var sendWeb = www.SendWebRequest();
-
-                while (!sendWeb.isDone)
-                    await Task.Yield();
-
-                if (www.isNetworkError || www.isHttpError)
+                if (ImagePaths.Length > 0)
                 {
-                    return null;
-                }
-                else
-                {
-                    Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-
-                    return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                }
-            }
-        }
-
-        void Env(Transform envui, Camera _alignmentCamera, EEventType[] Events, bool bool_0, EnvironmentShading _environmentShading, ref EnvironmentUIRoot envuiroot)
-        {
-            //Remove Orgin Environment GameObject
-            if (envuiroot != null)
-            {
-                Destroy(envuiroot.gameObject);
-            }
-
-            //Create New Environment
-            GameObject newEnv = Instantiate(EnvironmentPrefab, envui);
-
-            //Video Local Paths Url Replace
-            foreach (VideoPlayer vp in newEnv.GetComponentsInChildren<VideoPlayer>())
-            {
-                vp.url = string.Concat("file://", Path.Combine(ModPath, "videos", vp.url));
-            }
-
-            //EnvironmentUI Set New EnvironmentUIRoot
-            envuiroot = newEnv.GetComponent<EnvironmentUIRoot>();
-
-            //Init New EnvironmentUIRoot
-            envuiroot.Init(_alignmentCamera, Events, bool_0);
-            _environmentShading.SetDefaultShading(envuiroot.Shading);
-        }
-
-        bool OpenEnv()
-        {
-            return SettingsDatas.KeyEnvironment.Value;
-        }
-
-        bool OpenEnvRotate()
-        {
-            return SettingsDatas.KeyRotate.Value;
-        }
-
-        void SSP(Sprite[] _sprites, ref Image _splashScreen)
-        {
-            if (SettingsDatas.KeySplash.Value)
-            {
-                Sprite sprites;
-
-                if (!SettingsDatas.KeyOriginalSplash.Value && SplashSprite != null)
-                {
-                    sprites = SplashSprite;
-                }
-                else
-                {
-                    int length = SplashImages.Length + _sprites.Length;
-
-                    int num = UnityEngine.Random.Range(0, length);
-
-                    if (num >= _sprites.Length)
-                    {
-                        sprites = SplashSprite;
-                    }
-                    else
-                    {
-                        sprites = _sprites[num];
-                    }
+                    Texture2D = UnityWebRequestHelper.GetAsyncTexture(
+                        ImagePaths[UnityEngine.Random.Range(0, ImagePaths.Length)]);
                 }
 
-                _splashScreen.sprite = sprites;
+                if (VideoPaths.Length > 0)
+                {
+                    Video = new FileInfo(VideoPaths[UnityEngine.Random.Range(0, VideoPaths.Length)]);
+                }
+            }
+
+            public async void BindImage(RawImage rawImage)
+            {
+                if (Texture2D == null)
+                    return;
+
+                rawImage.texture = await Texture2D;
+            }
+
+            public void BindVideo(VideoPlayer videoPlayer, RawImage rawImage)
+            {
+                if (Video == null || !Video.Exists)
+                    return;
+
+                videoPlayer.url = Video.FullName;
+                videoPlayer.started += source => rawImage.texture = source.texture;
             }
         }
 
         public class SettingsData
         {
-            public ConfigEntry<bool> KeySplash;
-            public ConfigEntry<bool> KeyOriginalSplash;
+            public ConfigEntry<bool> KeyReplaceSplash;
+            public ConfigEntry<bool> KeyRandomOriginalSplash;
 
-            public ConfigEntry<bool> KeyEnvironment;
-            public ConfigEntry<bool> KeyRotate;
+            public ConfigEntry<bool> KeyReplaceEnvironment;
+
+            public ConfigEntry<int> KeyVideoVolume;
+
+            public SettingsData(ConfigFile configFile)
+            {
+                const string mainSettings = "Environment Replace Settings";
+
+                KeyReplaceSplash = configFile.Bind<bool>(mainSettings, "Splash Screen Replace", true);
+                KeyRandomOriginalSplash = configFile.Bind<bool>(mainSettings, "Random Original Splash Image", true);
+
+                KeyReplaceEnvironment = configFile.Bind<bool>(mainSettings, "Environment Replace", true);
+
+                KeyVideoVolume = configFile.Bind<int>(mainSettings, "Video Volume", 100,
+                    new ConfigDescription(string.Empty, new AcceptableValueRange<int>(0, 100)));
+            }
+        }
+
+        private class ReflectionData
+        {
+            public readonly RefHelper.HookRef EnvironmentUIRootInit;
+
+            public readonly RefHelper.HookRef SplashScreenPanelMethod0;
+
+            public ReflectionData()
+            {
+                EnvironmentUIRootInit = new RefHelper.HookRef(typeof(EnvironmentUIRoot), "Init");
+                SplashScreenPanelMethod0 = new RefHelper.HookRef(typeof(SplashScreenPanel),
+                    x => x.ReturnType == typeof(IEnumerator) && x.GetParameters().Length == 1);
+            }
         }
     }
 }
