@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("kmyuhkyuk-EnvironmentReplace")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("https://hub.sp-tarkov.com/files/file/688-environment-replace")]
+[assembly: AssemblyCompany("https://hub.sp-tarkov.com/files/file/759-environment-replace")]
 [assembly: AssemblyProduct("EnvironmentReplace")]
 [assembly: AssemblyCopyright("Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
