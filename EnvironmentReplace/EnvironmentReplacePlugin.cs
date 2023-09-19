@@ -17,7 +17,7 @@ using UnityEngine.Video;
 namespace EnvironmentReplace
 {
     [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "kmyuhkyuk-EnvironmentReplace", "1.4.2")]
-    [BepInDependency("com.kmyuhkyuk.EFTReflection", "1.1.4")]
+    [BepInDependency("com.kmyuhkyuk.EFTApi", "1.1.4")]
     [EFTConfigurationPluginAttributes("https://hub.sp-tarkov.com/files/file/759-environment-replace")]
     public partial class EnvironmentReplacePlugin : BaseUnityPlugin
     {
