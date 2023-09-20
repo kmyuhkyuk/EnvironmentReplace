@@ -13,6 +13,7 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using static EFTApi.EFTHelpers;
 
 namespace EnvironmentReplace
 {
@@ -61,7 +62,7 @@ namespace EnvironmentReplace
 
         private void Start()
         {
-            _reflectionData.EnvironmentUIRootInit.Add(this, nameof(EnvironmentUIRootInit), HarmonyPatchType.Prefix);
+            _EnvironmentUIRootHelper.Init.Add(this, nameof(EnvironmentUIRootInit), HarmonyPatchType.Prefix);
             _reflectionData.SplashScreenPanelMethod0.Add(this, nameof(SplashScreenPanelMethod0),
                 HarmonyPatchType.Prefix);
         }
@@ -152,13 +153,10 @@ namespace EnvironmentReplace
 
         private class ReflectionData
         {
-            public readonly RefHelper.HookRef EnvironmentUIRootInit;
-
             public readonly RefHelper.HookRef SplashScreenPanelMethod0;
 
             public ReflectionData()
             {
-                EnvironmentUIRootInit = new RefHelper.HookRef(typeof(EnvironmentUIRoot), "Init");
                 SplashScreenPanelMethod0 = new RefHelper.HookRef(typeof(SplashScreenPanel),
                     x => x.ReturnType == typeof(IEnumerator) && x.GetParameters().Length == 1);
             }
