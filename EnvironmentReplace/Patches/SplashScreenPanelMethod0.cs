@@ -6,9 +6,9 @@ namespace EnvironmentReplace
 {
     public partial class EnvironmentReplacePlugin
     {
-        private static void SplashScreenPanelMethod0(Sprite[] ____sprites, Image ____splashScreen)
+        private static void SplashScreenPanelMethod0(CanvasGroup canvasGroup, CanvasGroup ____imageCanvasGroup, Sprite[] ____sprites, Image ____splashScreen)
         {
-            if (_settingsData.KeyReplaceSplash.Value)
+            if (canvasGroup == ____imageCanvasGroup && _settingsData.KeyReplaceSplash.Value)
             {
                 _splash.Load();
 
