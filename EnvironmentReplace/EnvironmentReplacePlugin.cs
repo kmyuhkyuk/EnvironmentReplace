@@ -157,7 +157,7 @@ namespace EnvironmentReplace
 
             public ReflectionData()
             {
-                SplashScreenPanelMethod0 = new RefHelper.HookRef(typeof(SplashScreenPanel),
+                SplashScreenPanelMethod0 = RefHelper.HookRef.Create(typeof(SplashScreenPanel),
                     x => x.ReturnType == typeof(IEnumerator) && x.GetParameters().Length == 1);
             }
         }
