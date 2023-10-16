@@ -1,28 +1,53 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using EFT.UI;
+using EFTApi;
+using HarmonyLib;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using Random = UnityEngine.Random;
 
 namespace EnvironmentReplace
 {
     public partial class EnvironmentReplacePlugin
     {
-        private static void SplashScreenPanelMethod0(CanvasGroup canvasGroup, CanvasGroup ____imageCanvasGroup, Sprite[] ____sprites, Image ____splashScreen)
+        private static void SplashScreenPanelMethod0(SplashScreenPanel __instance, CanvasGroup canvasGroup,
+            CanvasGroup ____imageCanvasGroup, Sprite[] ____sprites)
         {
             if (canvasGroup == ____imageCanvasGroup && _settingsData.KeyReplaceSplash.Value)
             {
                 _splash.Load();
 
-                var splashScreen = ____splashScreen.gameObject;
+                var splashScreenImages = EFTVersion.AkiVersion > Version.Parse("3.6.1")
+                    ? Traverse.Create(__instance).Field("_images").GetValue<Image[]>()
+                    : new[] { Traverse.Create(__instance).Field("_splashScreen").GetValue<Image>() };
 
-                DestroyImmediate(____splashScreen);
+                var rawImageList = new List<RawImage>();
+                var videoPlayerList = new List<VideoPlayer>();
+                foreach (var splashScreenImage in splashScreenImages)
+                {
+                    var splashScreen = splashScreenImage.gameObject;
 
-                var rawImage = splashScreen.AddComponent<RawImage>();
+                    DestroyImmediate(splashScreenImage);
 
-                _splashVideoPlayer = splashScreen.AddComponent<VideoPlayer>();
+                    var rawImage = splashScreen.AddComponent<RawImage>();
 
-                _splashVideoPlayer.SetDirectAudioVolume(0, (float)_settingsData.KeyVideoVolume.Value / 100);
+                    rawImageList.Add(rawImage);
 
-                _splashVideoPlayer.isLooping = true;
+                    var videoPlayer = splashScreen.AddComponent<VideoPlayer>();
+
+                    videoPlayer.SetDirectAudioVolume(0, (float)_settingsData.KeyVideoVolume.Value / 100);
+
+                    videoPlayer.isLooping = true;
+
+                    videoPlayerList.Add(videoPlayer);
+                }
+
+                var rawImageArray = rawImageList.ToArray();
+                var videoPlayerArray = videoPlayerList.ToArray();
+
+                _splashVideoPlayers = videoPlayerArray;
 
                 var texIsNull = _splash.Texture2D == null;
 
@@ -40,20 +65,20 @@ namespace EnvironmentReplace
 
                             if (num < _splash.ImagePaths.Length)
                             {
-                                _splash.BindImage(rawImage);
+                                _splash.BindImage(rawImageArray);
                             }
                             else
                             {
-                                _splash.BindVideo(_splashVideoPlayer, rawImage);
+                                _splash.BindVideo(videoPlayerArray, rawImageArray);
                             }
 
                             break;
                         }
                         case true:
-                            _splash.BindVideo(_splashVideoPlayer, rawImage);
+                            _splash.BindVideo(videoPlayerArray, rawImageArray);
                             break;
                         default:
-                            _splash.BindImage(rawImage);
+                            _splash.BindImage(rawImageArray);
                             break;
                     }
                 }
@@ -65,15 +90,20 @@ namespace EnvironmentReplace
 
                     if (num < ____sprites.Length)
                     {
-                        rawImage.texture = ____sprites[num].texture;
+                        var texture2D = ____sprites[num].texture;
+
+                        foreach (var rawImage in rawImageArray)
+                        {
+                            rawImage.texture = texture2D;
+                        }
                     }
                     else if (num < ____sprites.Length + _splash.ImagePaths.Length)
                     {
-                        _splash.BindImage(rawImage);
+                        _splash.BindImage(rawImageArray);
                     }
                     else
                     {
-                        _splash.BindVideo(_splashVideoPlayer, rawImage);
+                        _splash.BindVideo(videoPlayerArray, rawImageArray);
                     }
                 }
             }
