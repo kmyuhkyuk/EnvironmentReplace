@@ -1,117 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using SevenZip;
+using CopyBuildAssembly;
 
 namespace Build
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class Program
     {
-        private static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
         private static void Main(string[] args)
         {
-            var hasArgs = args.Length > 0;
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var arg = args.ElementAtOrDefault(0);
+            var sha = Copy.GetTipSha(args.ElementAtOrDefault(1));
 
-            var configurationName = hasArgs ? args[0] : "Release";
+            const string modPath =
+                @"R:\Battlestate Games\Client.0.14.1.2.29197\BepInEx\Plugins\kmyuhkyuk-EnvironmentReplace";
 
-            switch (configurationName)
+            var versionName = "1.0.0";
+
+            var releaseName = $"{new DirectoryInfo(modPath).Name}-(Release_{versionName}).7z";
+
+            try
             {
-                case "Release":
-                    const string releasePath =
-                        "R:\\Battlestate Games\\Client.0.13.5.3.26535\\BepInEx\\plugins\\kmyuhkyuk-EnvironmentReplace";
+                Copy.CopyFolder(arg, "Release", Path.Combine(baseDirectory, "localized"),
+                    Path.Combine(modPath, "localized"));
 
-                    Copy(releasePath, new[]
-                    {
-                        "EnvironmentReplace"
-                    });
+                Copy.CopyAssembly(arg, "Release", baseDirectory, modPath, new[]
+                {
+                    "EnvironmentReplace"
+                }, sha);
 
-                    SevenZip(releasePath,
-                        new Dictionary<string, string> { { "ReadMe.txt", Path.Combine(BaseDirectory, "ReadMe.txt") } },
-                        new[] { "environment", "splash" }, Array.Empty<string>());
-                    break;
+                Copy.GenerateSevenZip(arg, "Release", modPath, releaseName, @"BepInEx\plugins",
+                    new[] { @"splash\1.mp4" }, Array.Empty<string>(),
+                    new[] { Path.Combine(baseDirectory, "ReadMe.txt") }, Array.Empty<string>());
             }
-
-            if (!hasArgs)
+            catch (Exception ex)
             {
-                Console.WriteLine("\nPress any key to close console app...");
+                Console.WriteLine(ex);
+
                 Console.ReadKey();
-            }
-        }
 
-        private static void SevenZip(string path)
-        {
-            SevenZip(path, null, Array.Empty<string>(), Array.Empty<string>());
-        }
-
-        private static void SevenZip(string path, Dictionary<string, string> addFileDictionary,
-            string[] excludeDirectoryNames, string[] excludeFileNames)
-        {
-            var directory = new DirectoryInfo(path);
-
-            if (directory.Parent == null)
-            {
-                throw new ArgumentNullException(nameof(directory.Parent));
-            }
-
-            var directoryFullName = $"{directory.FullName}\\";
-
-            SevenZipBase.SetLibraryPath(
-                $@"{Environment.CurrentDirectory}\{(IntPtr.Size == 4 ? "x86" : "x64")}\7z.dll");
-
-            var compressor = new SevenZipCompressor();
-
-            var filesDictionary = addFileDictionary ?? new Dictionary<string, string>();
-            foreach (var file in directory.GetFiles("*", SearchOption.AllDirectories))
-            {
-                if (file.Directory == null)
-                {
-                    throw new ArgumentNullException(nameof(file.Directory));
-                }
-
-                var fileDirectoryName = file.Directory.FullName.Replace(directoryFullName, string.Empty);
-
-                if (!string.IsNullOrEmpty(fileDirectoryName))
-                {
-                    if (excludeDirectoryNames.Contains(fileDirectoryName))
-                    {
-                        Console.WriteLine($"Exclude {fileDirectoryName} Directory\nSkip {file.FullName}");
-                        continue;
-                    }
-
-                    var fileName = file.FullName.Replace(directoryFullName, string.Empty);
-
-                    if (excludeFileNames.Contains(fileName))
-                    {
-                        Console.WriteLine($"Exclude {fileName} File\nSkip {file.FullName}");
-                        continue;
-                    }
-                }
-
-                filesDictionary.Add(
-                    file.FullName.Replace(directory.Parent.FullName, "BepInEx\\plugins"),
-                    file.FullName);
-            }
-
-            compressor.CompressFileDictionary(filesDictionary,
-                File.Create(Path.Combine(directory.Parent.FullName, $"{directory.Name}.7z")));
-        }
-
-        private static void Copy(string toPath, string[] dllNames)
-        {
-            foreach (var dllName in dllNames)
-            {
-                var dllFullName = $"{dllName}.dll";
-
-                var dllPath = Path.Combine(BaseDirectory, dllFullName);
-
-                var toDLLPath = Path.Combine(toPath, dllFullName);
-
-                Console.WriteLine($"Copy {Path.GetFileName(dllFullName)} to \n{toDLLPath}");
-
-                File.Copy(dllPath, toDLLPath, true);
+                Process.GetCurrentProcess().Kill();
             }
         }
     }

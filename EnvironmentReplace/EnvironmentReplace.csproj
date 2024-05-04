@@ -84,8 +84,12 @@
     <Compile Include="Attributes\ConfigurationManagerAttributes.cs" />
     <Compile Include="Attributes\EFTConfigurationPluginAttributes.cs" />
     <Compile Include="EnvironmentReplacePlugin.cs" />
+    <Compile Include="Models\EnvironmentReplaceModel.cs" />
+    <Compile Include="Models\ImageAndVideoModel.cs" />
+    <Compile Include="Models\ReflectionModel.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Patches\EnvironmentUIRootInit.cs" />
-    <Compile Include="Patches\SplashScreenPanelMethod0.cs" />
+    <Compile Include="Patches\SplashScreenPanelSetCanvasGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
