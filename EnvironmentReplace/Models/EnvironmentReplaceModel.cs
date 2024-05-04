@@ -1,18 +1,13 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using UnityEngine.Video;
 
 namespace EnvironmentReplace.Models
 {
     internal class EnvironmentReplaceModel
     {
-        private static readonly Lazy<EnvironmentReplaceModel> Lazy =
-            new Lazy<EnvironmentReplaceModel>(() => new EnvironmentReplaceModel());
+        public static EnvironmentReplaceModel Instance { get; private set; }
 
-        public static EnvironmentReplaceModel Instance => Lazy.Value;
-
-        public readonly string ModPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-            "BepInEx/plugins/kmyuhkyuk-EnvironmentReplace");
+        public readonly string ModPath = Path.Combine(BepInEx.Paths.PluginPath, "kmyuhkyuk-EnvironmentReplace");
 
         public readonly ImageAndVideoModel SplashMedia;
 
@@ -26,6 +21,15 @@ namespace EnvironmentReplace.Models
         {
             SplashMedia = new ImageAndVideoModel(Path.Combine(ModPath, "splash"));
             EnvironmentMedia = new ImageAndVideoModel(Path.Combine(ModPath, "environment"));
+        }
+
+        // ReSharper disable once UnusedMethodReturnValue.Global
+        public static EnvironmentReplaceModel Create()
+        {
+            if (Instance != null)
+                return Instance;
+
+            return Instance = new EnvironmentReplaceModel();
         }
     }
 }

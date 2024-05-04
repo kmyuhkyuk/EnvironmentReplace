@@ -15,6 +15,8 @@ namespace EnvironmentReplace
         {
             var settingsModel = SettingsModel.Create(Config);
 
+            EnvironmentReplaceModel.Create();
+
             settingsModel.KeyVideoVolume.SettingChanged += (sender, args) =>
             {
                 var environmentReplaceModel = EnvironmentReplaceModel.Instance;
