@@ -44,13 +44,14 @@ namespace EnvironmentReplace.Models
             }
 
             ImagePaths = imagePathList.ToArray();
-            VideoPaths = videoPathList.ToArray();
 
             if (ImagePaths.Length > 0)
             {
                 Texture2D = UnityWebRequestHelper.GetAsyncTexture(
                     ImagePaths[UnityEngine.Random.Range(0, ImagePaths.Length)]);
             }
+
+            VideoPaths = videoPathList.ToArray();
 
             if (VideoPaths.Length > 0)
             {

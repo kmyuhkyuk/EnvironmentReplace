@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using EFT.UI;
 using EFTApi;
 using EnvironmentReplace.Models;
-using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -18,6 +17,7 @@ namespace EnvironmentReplace
         {
             var settingsModel = SettingsModel.Instance;
             var environmentReplaceModel = EnvironmentReplaceModel.Instance;
+            var reflectionModel = ReflectionModel.Instance;
 
             if (!settingsModel.KeyReplaceSplash.Value || canvasGroup != ____imageCanvasGroup)
                 return;
@@ -27,8 +27,8 @@ namespace EnvironmentReplace
             splashMedia.Load();
 
             var splashScreenImages = EFTVersion.AkiVersion > Version.Parse("3.6.1")
-                ? Traverse.Create(__instance).Field("_images").GetValue<Image[]>()
-                : new[] { Traverse.Create(__instance).Field("_splashScreen").GetValue<Image>() };
+                ? reflectionModel.RefImages?.GetValue(__instance) ?? Array.Empty<Image>()
+                : new[] { reflectionModel.RefSplashScreen?.GetValue(__instance) };
 
             var rawImageList = new List<RawImage>();
             var videoPlayerList = new List<VideoPlayer>();
@@ -66,9 +66,9 @@ namespace EnvironmentReplace
                     {
                         var length = splashMedia.ImagePaths.Length + splashMedia.VideoPaths.Length;
 
-                        var num = Random.Range(0, length);
+                        var randomNum = Random.Range(0, length);
 
-                        if (num < splashMedia.ImagePaths.Length)
+                        if (randomNum < splashMedia.ImagePaths.Length)
                         {
                             splashMedia.BindImage(rawImageArray);
                         }
@@ -91,18 +91,18 @@ namespace EnvironmentReplace
             {
                 var length = ____sprites.Length + splashMedia.ImagePaths.Length + splashMedia.VideoPaths.Length;
 
-                var num = Random.Range(0, length);
+                var randomNum = Random.Range(0, length);
 
-                if (num < ____sprites.Length)
+                if (randomNum < ____sprites.Length)
                 {
-                    var texture2D = ____sprites[num].texture;
+                    var texture2D = ____sprites[randomNum].texture;
 
                     foreach (var rawImage in rawImageArray)
                     {
                         rawImage.texture = texture2D;
                     }
                 }
-                else if (num < ____sprites.Length + splashMedia.ImagePaths.Length)
+                else if (randomNum < ____sprites.Length + splashMedia.ImagePaths.Length)
                 {
                     splashMedia.BindImage(rawImageArray);
                 }

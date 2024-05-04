@@ -69,9 +69,9 @@ namespace EnvironmentReplace
 
             var length = environmentMedia.ImagePaths.Length + environmentMedia.VideoPaths.Length;
 
-            var num = Random.Range(0, length);
+            var randomNum = Random.Range(0, length);
 
-            if (num < environmentMedia.ImagePaths.Length)
+            if (randomNum < environmentMedia.ImagePaths.Length)
             {
                 environmentMedia.BindImage(rawImage);
             }
