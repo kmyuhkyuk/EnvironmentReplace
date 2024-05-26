@@ -18,7 +18,7 @@ namespace Build
             const string modPath =
                 @"R:\Battlestate Games\Client.0.14.1.2.29197\BepInEx\Plugins\kmyuhkyuk-EnvironmentReplace";
 
-            var versionName = "1.0.0";
+            var versionName = "1.4.3";
 
             var releaseName = $"{new DirectoryInfo(modPath).Name}-(Release_{versionName}).7z";
 
