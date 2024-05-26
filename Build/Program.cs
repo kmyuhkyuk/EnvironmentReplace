@@ -33,7 +33,7 @@ namespace Build
                 }, sha);
 
                 Copy.GenerateSevenZip(arg, "Release", modPath, releaseName, @"BepInEx\plugins",
-                    new[] { @"splash\1.mp4" }, Array.Empty<string>(),
+                    new[] { @"splash\1.mp4", @"environment\background.mp4" }, Array.Empty<string>(),
                     new[] { Path.Combine(baseDirectory, "ReadMe.txt") }, Array.Empty<string>());
             }
             catch (Exception ex)
