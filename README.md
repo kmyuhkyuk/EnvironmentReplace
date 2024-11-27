@@ -3,7 +3,7 @@
 Replace Main menu background and Splash Screen
 
 ## How build the source
-1. Dowload or Clone the branch
-2. Visual Studio open EnvironmentReplace.sln
-3. using project need dll
-4. build EnvironmentReplace.dll to bin\Debug
+1. Clone master branch
+2. Open EnvironmentReplace.sln with Visual Studio
+3. References dll required by project
+4. Build EnvironmentReplace

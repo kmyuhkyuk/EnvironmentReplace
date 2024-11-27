@@ -20,7 +20,7 @@ namespace Build
 
             const string versionName = "1.5.0";
 
-            var releaseName = $"{new DirectoryInfo(modPath).Name}-(Release_{versionName}).7z";
+            var releaseName = $"{new DirectoryInfo(modPath).Name}(Release_{versionName}).7z";
 
             try
             {
