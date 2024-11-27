@@ -6,7 +6,7 @@ using static EFTApi.EFTHelpers;
 
 namespace EnvironmentReplace
 {
-    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "EnvironmentReplace", "1.4.3")]
+    [BepInPlugin("com.kmyuhkyuk.EnvironmentReplace", "EnvironmentReplace", "1.5.0")]
     [BepInDependency("com.kmyuhkyuk.EFTApi", "1.2.1")]
     [EFTConfigurationPluginAttributes("https://hub.sp-tarkov.com/files/file/759-environment-replace")]
     public partial class EnvironmentReplacePlugin : BaseUnityPlugin
