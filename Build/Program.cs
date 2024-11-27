@@ -16,7 +16,7 @@ namespace Build
             var sha = Copy.GetTipSha(args.ElementAtOrDefault(1));
 
             const string modPath =
-                @"R:\Battlestate Games\Client.0.14.9.1.30626\BepInEx\plugins\kmyuhkyuk-EnvironmentReplace";
+                @"R:\Battlestate Games\Client.0.15.5.1.33420\BepInEx\plugins\kmyuhkyuk-EnvironmentReplace";
 
             const string versionName = "1.5.0";
 
